@@ -5,7 +5,7 @@ pygame.font.init()
 
 # GLOBALS VARS
 WIDTH = 300
-HEIGHT = 530
+HEIGHT = 550
 
 # the game has 10 x 20 blocks 
 GAME_WIDTH = 200  
@@ -253,8 +253,9 @@ def clear_rows(grid, locked):
             if y < ind:
                 newKey = (x, y + inc)
                 locked[newKey] = locked.pop(key)
+    return inc
 
-def draw_window(WIN):
+def draw_window(WIN, score):
     WIN.fill((0, 0, 0))
 
     # adding the title to the top of the window
@@ -265,6 +266,11 @@ def draw_window(WIN):
     for i in range(len(grid)):
         for j in range(len(grid[i])):
             pygame.draw.rect(WIN, grid[i][j], (CORNER_X + j* 20, CORNER_Y + i * 20, 20, 20), 0)
+
+    font = pygame.font.SysFont('arial', 30, bold=True)
+    label = font.render('Score: ' + str(score), 1, (255,255,255))
+
+    WIN.blit(label, (CORNER_X + GAME_WIDTH/2 - (label.get_width() / 2), CORNER_Y + HEIGHT -115 - label.get_height()/2))
 
     draw_grid(WIN)
 
@@ -288,6 +294,9 @@ def main():
     
     clock = pygame.time.Clock()
     fall_time = 0
+    
+    # to update the score
+    score = 0
 
     while run:
         # the initial fall speed
@@ -356,7 +365,9 @@ def main():
             # call four times to check for multiple clear rows
             clear_rows(grid, locked_positions)
 
-        draw_window(WIN)
+        score += clear_rows(grid, locked_positions) * 10
+
+        draw_window(WIN, score)
         pygame.display.update()
 
         # Check if the user has lost
